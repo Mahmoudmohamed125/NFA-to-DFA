@@ -1,33 +1,56 @@
-# Regex to NFA & NFA to DFA Converter
+NFA to DFA Converter
+Description
+This project implements a conversion from a Non-Deterministic Finite Automaton (NFA) to a Deterministic Finite Automaton (DFA) using the subset construction algorithm. The conversion allows for handling epsilon (ε) transitions, ensuring the equivalent DFA correctly simulates the NFA’s behavior.
 
-## Overview
-This project implements a converter that transforms a regular expression into a Non-deterministic Finite Automaton (NFA) and further converts the NFA into a Deterministic Finite Automaton (DFA). The implementation follows **Thompson’s construction** for regex-to-NFA conversion and **subset construction** for NFA-to-DFA conversion.
+Features
+Supports epsilon (ε) transitions.
 
-## Features
-✔ Convert a given regular expression to an NFA  
-✔ Convert the generated NFA to a DFA  
-✔ Supports **concatenation (.), union (|), and Kleene star (*)**  
-✔ Uses **epsilon closures** for efficient NFA-to-DFA conversion  
-✔ Implements a **state-based approach** for managing transitions  
+Uses subset construction to generate the equivalent DFA.
 
-## How It Works
-### **Regex to NFA Conversion**
-- Constructs an NFA using **Thompson's construction**.
-- Uses a **stack-based** approach to build the automaton.
+Displays the DFA states, transitions, start state, and final states.
 
-### **NFA to DFA Conversion**
-- Computes **epsilon closures** of NFA states.
-- Uses the **subset construction** algorithm to generate the DFA.
+Requirements
+Python 3.x
 
-## Code Structure
-- `State` class → Represents a state in an automaton.  
-- `NFA` class → Converts a regex into an NFA.  
-- `DFA` class → Converts an NFA into a DFA.  
-- `epsilon_closure` function → Computes the epsilon closure of a set of states.  
+Installation
+Clone the repository:
 
-## Example Usage
-```python
-regex = "ab|*"  # Represents (a|b)* in postfix notation
-nfa = NFA.from_regex(regex)
-dfa = DFA.from_nfa(nfa)
-print("DFA Created Successfully")
+sh
+Copy
+Edit
+git clone https://github.com/yourusername/nfa-to-dfa.git
+cd nfa-to-dfa
+Usage
+Run the script:
+
+sh
+Copy
+Edit
+python nfa_to_dfa.py
+Example NFA
+States: {q0, q1, q2}
+
+Alphabet: {a, b}
+
+Transitions:
+
+q0 --a--> q1
+
+q1 --b--> q2
+
+q2 --ε--> q0
+
+Start State: q0
+
+Final State: {q2}
+
+Expected Output
+The script prints the equivalent DFA, displaying:
+
+States
+
+Transitions
+
+Start state
+
+Final states
