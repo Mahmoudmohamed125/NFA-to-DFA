@@ -1,6 +1,6 @@
 import pygame
 import pygame_textinput
-from pygame_textinput import TextInputManager, TextInputVisualizer#take input from the user
+from pygame_textinput import TextInputManager, TextInputVisualizer #take input from the user
 import math
 from graphviz import Digraph
 import io
@@ -134,8 +134,8 @@ def render_ui(text_inputs, active_textinput, pulse_time, NfaFlag):
 	pygame.draw.rect(screen, WHITE, (0, 0, 280, 1000), width=0)
 
 	# Draw labels and text boxes
-	for key, input_data in text_inputs.items():
-		draw_text_with_stroke(input_data['label'], font, WHITE, BLACK, input_data['label_pos'], NfaFlag)
+	for key, input_data in text_inputs.items(): 
+		draw_text_with_stroke(input_data['label'], font, BLACK, input_data['label_pos'])
 		#screen.blit(input_data['visualizer'].surface, input_data['pos'])
 		render_clipped_text_input(screen, input_data, clip_length=26)
 
@@ -144,7 +144,7 @@ def render_ui(text_inputs, active_textinput, pulse_time, NfaFlag):
 
 	# Draw the submit button
 	pygame.draw.rect(screen, (0, 255, 0), submit_button_rect)
-	draw_text_with_stroke('Submit', font, WHITE, BLACK, (110, 500), NfaFlag)
+	draw_text_with_stroke('Submit', font, BLACK, (110, 500))
 
 
 # Function to handle text input focus
@@ -292,7 +292,7 @@ BLUE = (0, 255, 255)
 LIGHT_BLUE = (173, 216, 230)
 WHITE = (255, 255, 255)
 
-font_path = "pixel.TTF"
+font_path = "AvenirLTProBook.otf"
 font_size = 14
 font = pygame.font.Font(font_path, font_size)
 strock_font = pygame.font.Font(font_path, 19)
@@ -305,25 +305,7 @@ def draw_pulsating_divider(x, y, width, height, pulse_time):
 stroke_ctr = 0
 
 	
-def draw_text_with_stroke(text, font, text_color, stroke_color, position, flag):
-	stroke_offset = 2
-	colors = [
-		(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 165, 0),
-		(128, 0, 128), (0, 255, 255), (255, 192, 203), (0, 128, 0), (128, 0, 0),
-		(0, 128, 128), (128, 128, 0), (75, 0, 130), (255, 20, 147), (255, 140, 0),
-		(139, 69, 19), (47, 79, 79), (176, 196, 222), (255, 215, 0), (218, 165, 32),
-		(154, 205, 50), (186, 85, 211), (70, 130, 180), (240, 230, 140), (152, 251, 152),
-		(173, 216, 230), (250, 128, 114), (245, 222, 179), (176, 224, 230), (0, 0, 0)
-	]
-	global stroke_ctr
-	for dx in [-stroke_offset, stroke_offset]:
-		for dy in [-stroke_offset, stroke_offset]:
-			if flag:
-				stroke_surface = font.render(text, True, stroke_color)
-			else:
-				stroke_surface = font.render(text, True, colors[stroke_ctr])
-			screen.blit(stroke_surface, (position[0] + dx, position[1] + dy))
-	stroke_ctr = (stroke_ctr + 1) % 30
+def draw_text_with_stroke(text, font, text_color, position):
 	text_surface = font.render(text, True, text_color)
 	screen.blit(text_surface, position)
 
@@ -416,3 +398,109 @@ while exit:
 
 
 pygame.quit()
+
+
+# import pygame
+# import math
+# import time
+# import re
+# from NFA import NFA
+
+# # Constants
+# FPS = 60
+# WINDOW_SIZE = (800, 600)
+# FONT_PATH = "pixel.TTF"
+# FONT_SIZE = 14
+
+# # Colors
+# WHITE = (255, 255, 255)
+# BLACK = (0, 0, 0)
+# CYAN = (0, 255, 255)
+# LIGHT_CYAN = (173, 216, 230)
+
+
+# class InputBox:
+#     """
+#     A simple text input box for pygame.
+#     """
+#     def __init__(self, rect, font, initial_text=""):
+#         self.rect = pygame.Rect(rect)
+#         self.font = font
+#         self.text = initial_text
+#         self.is_active = False
+#         self.color_inactive = (150, 150, 150)
+#         self.color_active = (0, 255, 0)
+
+#     def handle_event(self, event):
+#         if event.type == pygame.MOUSEBUTTONDOWN:
+#             self.is_active = self.rect.collidepoint(event.pos)
+#         if event.type == pygame.KEYDOWN and self.is_active:
+#             if event.key == pygame.K_BACKSPACE:
+#                 self.text = self.text[:-1]
+#             else:
+#                 self.text += event.unicode
+
+#     def draw(self, surface):
+#         color = self.color_active if self.is_active else self.color_inactive
+#         pygame.draw.rect(surface, color, self.rect, 2)
+#         txt_surf = self.font.render(self.text, True, WHITE)
+#         surface.blit(txt_surf, (self.rect.x + 5, self.rect.y + 5))
+
+
+# class AutomataApp:
+#     def __init__(self):
+#         pygame.init()
+#         self.clock = pygame.time.Clock()
+#         self.screen = pygame.display.set_mode(WINDOW_SIZE)
+#         pygame.display.set_caption("NFA to DFA Simulator")
+#         self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
+
+#         # Input fields
+#         self.input_states = InputBox((20, 20, 200, 30), self.font, "q0,q1,q2")
+#         self.input_alphabet = InputBox((20, 70, 200, 30), self.font, "a,b,c")
+#         self.input_transitions = InputBox((20, 120, 200, 30), self.font, "(q0,q1,a),(q1,q2,b)")
+#         self.input_start = InputBox((20, 170, 200, 30), self.font, "q0")
+#         self.input_final = InputBox((20, 220, 200, 30), self.font, "q2")
+
+#         self.inputs = [
+#             self.input_states,
+#             self.input_alphabet,
+#             self.input_transitions,
+#             self.input_start,
+#             self.input_final,
+#         ]
+
+#     def parse_transitions(self, text: str):
+#         # Simplified tuple parsing
+#         matches = re.findall(r"\(([^)]+)\)", text)
+#         transitions = []
+#         for match in matches:
+#             parts = [p.strip() for p in match.split(',')]
+#             if len(parts) == 3:
+#                 transitions.append(tuple(parts))
+#         return transitions
+
+#     def run(self):
+#         running = True
+#         while running:
+#             for event in pygame.event.get():
+#                 if event.type == pygame.QUIT:
+#                     running = False
+#                 for input_box in self.inputs:
+#                     input_box.handle_event(event)
+
+#             self.screen.fill(BLACK)
+#             # Draw input boxes
+#             for box in self.inputs:
+#                 box.draw(self.screen)
+
+#             # TODO: draw NFA and DFA visualizations
+
+#             pygame.display.flip()
+#             self.clock.tick(FPS)
+
+#         pygame.quit()
+
+
+# if __name__ == "__main__":
+#     AutomataApp().run()
