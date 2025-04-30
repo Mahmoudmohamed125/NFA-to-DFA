@@ -25,6 +25,13 @@ class AutomatonVisualizer:
 		self.size = size
 		self.image = None
 		self.create_graphs()
+		
+		# Load overlay images
+		self.nfa_overlay = pygame.image.load('NFA.png').convert_alpha()
+		self.dfa_overlay = pygame.image.load('DFA.png').convert_alpha()
+		overlay_size = (80, 30)  # Adjust as needed
+		self.nfa_overlay = pygame.transform.smoothscale(self.nfa_overlay, overlay_size)
+		self.dfa_overlay = pygame.transform.smoothscale(self.dfa_overlay, overlay_size)
 
 	def create_graphs(self):
 		dot_nfa = Digraph(format='png', engine='dot')
@@ -62,9 +69,14 @@ class AutomatonVisualizer:
 		self.dfa_image = pygame.transform.smoothscale(raw_dfa, self.size)
 
 	def draw(self):
+		# Draw the NFA image and overlay
 		self.screen.blit(self.nfa_image, self.pos)
-		self.screen.blit(
-			self.dfa_image, (self.pos[0] + self.size[0] + 20, self.pos[1]))
+		self.screen.blit(self.nfa_overlay, (self.pos[0] + 10, self.pos[1] + 10))  # top-left of NFA
+
+		# Draw the DFA image and overlay
+		dfa_pos = (self.pos[0] + self.size[0] + 20, self.pos[1])
+		self.screen.blit(self.dfa_image, dfa_pos)
+		self.screen.blit(self.dfa_overlay, (dfa_pos[0] + 210, dfa_pos[1] + 10))  # top-left of DFA
 
 
 class TextBox:
@@ -163,8 +175,9 @@ class NFAApp:
 		self.textboxes = [
 			TextBox('States (e.g., q0,q1)', 'q0,q1,q2', (10, 40), self.font),
 			TextBox('Alphabet (e.g., a,b)', 'a,b,c', (10, 120), self.font),
-			TextBox('Transitions (e.g., q0,q1,a;q1,q2,b)',
-					'q0,q1,a;q1,q2,b;q2,q0,c', (10, 200), self.font),
+			TextBox(
+				'Transitions (e.g., (q0,q1,a) (q1,q2,b))', '(q0,q1,a) (q1,q2,b) (q2,q0,c)', (10, 200), self.font
+			),
 			TextBox('Start State', 'q0', (10, 280), self.font),
 			TextBox('Final States', 'q2', (10, 360), self.font)
 		]
@@ -175,8 +188,12 @@ class NFAApp:
 		states = set(self.textboxes[0].value.split(','))
 		alphabet = set(self.textboxes[1].value.split(','))
 		transitions = {}
-		for part in self.textboxes[2].value.split(';'):
-			src, dst, sym = part.split(',')
+		import re
+
+		transition_pattern = r'\(\s*([^,\s]+)\s*,\s*([^,\s]+)\s*,\s*([^,\s]+)\s*\)'
+		matches = re.findall(transition_pattern, self.textboxes[2].value)
+
+		for src, dst, sym in matches:
 			key = (src.strip(), sym.strip())
 			transitions.setdefault(key, set()).add(dst.strip())
 		start = self.textboxes[3].value.strip()
